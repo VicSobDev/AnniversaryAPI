@@ -1,0 +1,6 @@
+images/*
+db.sqlite
+.env
+prometheus/prometheus.yml
+prometheus/key
+.DS_Store

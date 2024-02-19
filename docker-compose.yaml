@@ -1,0 +1,43 @@
+version: '3.7'
+
+services:
+  anniversaryapi:
+    build: .
+    ports:
+      - "8080:8080" # Expose the port your Go app runs on
+      - "8081:8081" # Expose the port your Go app runs on
+    volumes:
+      - ./images:/app/images # Assuming your app saves images here
+    environment:
+      - JWT_KEY=${JWT_KEY}
+      - PROMETHEUS_KEY=${PROMETHEUS_KEY}
+      - API_KEY=${API_KEY}
+    depends_on:
+      - prometheus
+      - grafana
+
+  prometheus:
+    image: prom/prometheus:v2.26.0
+    volumes:
+      - ./prometheus:/etc/prometheus # Make sure to have a prometheus.yml in this directory
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+
+  grafana:
+    image: grafana/grafana:7.5.4
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  grafana_data:
+
